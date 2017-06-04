@@ -1,13 +1,16 @@
-NUMBER_OF_STARS = 300
-MAX_RADIUS = 4
+NUMBER_OF_STARS = 300;
+MAX_RADIUS = 4;
 
 WINDOW_WIDTH = $(window).width();
 WINDOW_HEIGHT = $(window).height();
 
-canvas = null
-context = null
+canvas = null;
+context = null;
 
-stars = []
+mouseX = 0;
+mouseY = 0;
+
+stars = [];
 
 xrandom = function() {
 	return Math.floor(canvas.width * Math.random());
@@ -43,13 +46,51 @@ var render = function() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
 	//Update the position of the stars.
+
+	var deviateX = mouseX - canvas.width/2;
+	var deviateY = mouseY - canvas.height/2;
+
+	deviateX /= 100
+	deviateY /= 100
+
 	for (var i = 0; i < NUMBER_OF_STARS; ++i)
 	{
-		stars[i].y -= stars[i].radius;
+		var xc = false;
+		var yc = false;
+
+		stars[i].y -= deviateY * stars[i].radius;
+		stars[i].x -= deviateX * stars[i].radius;
+		
 		if (stars[i].y < 0)
 		{
 			stars[i].y = canvas.height;
+			yc = true;
+		}
+		else if (stars[i].y > canvas.height)
+		{
+			stars[i].y = 0;
+			yc = true;
+		}
+
+		if (stars[i].x < 0)
+		{
+			stars[i].x = canvas.width;
+			xc = true;
+		}
+		if (stars[i].x > canvas.width)
+		{
+			stars[i].x = 0; 
+			xc = true;
+		}
+
+		if (yc)
+		{
 			stars[i].x = xrandom();
+			stars[i].radius = radrandom();
+		}
+		if (xc)
+		{
+			stars[i].y = yrandom();
 			stars[i].radius = radrandom();
 		}
 	}
@@ -77,6 +118,14 @@ var runStarAnim = function() {
 		stars.push(new Star());
 
 	render();
+}
+
+document.addEventListener('mousemove', onMouseUpdate, false);
+document.addEventListener('mouseenter', onMouseUpdate, false);
+
+function onMouseUpdate(e) {
+	mouseX = e.pageX;
+	mouseY = e.pageY;
 }
 
 $(document).ready(runStarAnim);
